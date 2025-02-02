@@ -234,6 +234,7 @@
       $.ajax({
         url: apiUrl,
         type: "POST",
+        mode: "cors", // Tambahkan ini
         contentType: "application/json",
         data: JSON.stringify(requestData),
         success: function (response) {

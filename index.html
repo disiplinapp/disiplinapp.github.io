@@ -16,26 +16,38 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert/dist/sweetalert.min.js"></script>
-
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
   <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
   <!-- Memuat html2canvas -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
+  <!-- you load jquery somewhere before jSignature ... -->
+  <script src=https://cdnjs.cloudflare.com/ajax/libs/jSignature/2.1.3/jSignature.min.js></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jSignature/2.1.3/flashcanvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jSignature/2.1.3/jSignature.min.noconflict.js"></script>
+  
+  <link href="https://fonts.cdnfonts.com/css/sf-pro-display" rel="stylesheet">
+  
   <!-- Manifest in a <script> block -->
   <link
     rel="manifest"
     href="data:application/manifest+json,{'name':'Simple PWA','short_name':'PWA','start_url':'/ftp.php','display':'standalone','background_color':'#ffffff','theme_color':'#000000','icons':[{'src':'https://via.placeholder.com/192','sizes':'192x192','type':'image/png'},{'src':'https://via.placeholder.com/512','sizes':'512x512','type':'image/png'}]}" />
-  <style>
-    @import url('https://v1.fontapi.ir/css/SFProDisplay');
-  </style>
+
   <style>
     body {
-      font-family: 'SF Pro Display', sans-serif;
+      font-family: 'SF Pro Display', sans-serif;                                                                       
       font-size: 14px;
       /* Atur ukuran font untuk seluruh teks di body */
       padding: 20px;
       text-align: center;
+    }
+
+    .apple-background {
+      background-color: #f8f8f8;
+    }
+
+    .apple-text{
+      color: #333333;
     }
 
     helptext {
@@ -52,22 +64,39 @@
   <script>
     $(document).ready(function() {
 
-      // // Disable close functionality
-      // $(document).on('keydown', function (event) {
-      //   if (event.key === 'Escape') {
-      //     event.preventDefault();
-      //   }
+      // $(document).on("contextmenu", function(event) {
+      //   event.preventDefault(); // Mencegah menu konteks muncul
       // });
 
-      // $(document).on('click', '.modal', function (e) {
-      //   e.stopPropagation();
-      // });
+      let dataDummy = {
+        id_pertemuan: 99,
+        nama_pertemuan: "Pertemuan 1",
+        tanggal: "2025-02-10",
+        status: "Selesai"
+       };
 
-      // $('.modal').modal({ backdrop: 'static', keyboard: false });
+      //tampilKegiatan(dataDummy);
 
+      var $sigdiv;
 
-      $(document).on("contextmenu", function (e) {
-          e.preventDefault();
+      $("#clear").click(function () {
+          $sigdiv.jSignature("reset");
+          $("#someelement").html("");
+          $("#svgTextArea").val("");
+      });
+
+      $("#save").click(function () {
+          var datapair = $sigdiv.jSignature("getData", "svgbase64");
+          var i = new Image();
+          i.src = "data:" + datapair[0] + "," + datapair[1];
+          $("#someelement").html(i); // Append the signature image
+
+          var svgText = atob(datapair[1]); // Decode Base64 ke teks SVG
+
+          $("#svgTextArea").val(svgText); // Masukkan ke textarea
+
+          savePresensi(); // Simpan data kehadiran
+          
       });
 
       const url = "https://script.google.com/macros/s/AKfycbxU13l4ozk0PDfS4If4e2ssHofF1Lh51Btlv31Mqccg-_UdR1oyZcrdhkGJmZpVYWfTeg/exec"; // Ganti dengan URL Web App Anda  
@@ -113,6 +142,10 @@
           $("#step2").show();
           updateStepLink("#step2Link", true, "PERTEMUAN");
           updateStepLink("#step1Link", false, "1"); // Menghapus status aktif dari step 1
+        } else if (currentStep === 3) {
+          $("#step3").show();
+          updateStepLink("#step3Link", true, "TANDA TANGAN");
+          updateStepLink("#step2Link", false, "2"); // Menghapus status aktif dari step 2
         }
       }
 
@@ -127,7 +160,7 @@
           $(stepId).html(
             `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" class="bi bi-check-circle-fill" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg> <span style="color: white;"></span>`
           );
-        }
+        } 
       }
 
       // Fungsi untuk menampilkan data pengguna di halaman (Step 2)
@@ -162,7 +195,7 @@
             }
 
             // Ubah src dari gambar avatar
-            $(".avimg").attr("src", avatarUrl);
+            //$(".avimg").attr("src", avatarUrl);
           },
           error: function(error) {
             console.log("Error:", error);
@@ -291,7 +324,7 @@
             `<option value="${userPertemuan.id_pertemuan}">${userPertemuan.nama_pertemuan} (${convertDateToReadableFormat(userPertemuan.tanggal)})</option>`
           );
         } else {
-          alert("Data pertemuan tidak valid");
+          // alert("Data pertemuan tidak valid");
         }
       }
 
@@ -363,6 +396,141 @@
 
         }
       }
+
+      // Fungsi untuk menyimpan beserta tanda tangan
+      function savePresensi(){
+
+        $("#loading").show(); // Tampilkan spinner loading
+        $("#submitFormButton").prop("disabled", true).text("Proses Presensi...");
+        $("#save").prop("disabled", true).text("Proses Presensi...");
+
+        const idPegawai = $("#idPegawai").val(); // ID Pegawai
+        const idPertemuan = $("#pertemuanInput").val(); // Kegiatan yang dipilih
+        const tanggal = new Date().toLocaleDateString('id-ID'); // Format tanggal lokal   
+        const tanda_tangan = $("#svgTextArea").val();
+
+        generateQRCode(idPegawai); // Generate QR code
+
+        // Data yang akan dikirim ke sheet `data_kehadiran`
+        const params = {
+          idPegawai: idPegawai,
+          idPertemuan: idPertemuan,
+          tanda_tangan: tanda_tangan
+        };
+
+        // Kirim data menggunakan fetch
+        fetch(url, {
+            redirect: "follow",
+            method: "POST",
+            body: JSON.stringify(params),
+            headers: {
+              "Content-Type": "text/plain;charset=utf-8",
+            },
+          })
+          .then(response => response.json())
+          .then(data => {
+
+            if (data.status === "success") {
+              swal({
+                title: "Presensi Berhasil!",
+                text: "Data kehadiran Anda berhasil disimpan.",
+                icon: "success",
+                button: {
+                  text: "OK",
+                  className: "btn btn-primary"
+                }
+              }).then(() => {
+                // Opsional: lakukan tindakan tambahan setelah presensi berhasil
+                // Misalnya, reset form atau navigasi ke halaman lain
+                $("#loading").hide(); // Sembunyikan spinner loading
+                $("#submitFormButton").prop("disabled", false).text("Presensi sekarang");
+                $("#save").prop("disabled", false).text("Presensi sekarang");
+
+                $(".forma").prop("hidden", true);
+                $(".formc").prop("hidden", false);
+
+                swal({
+                  title: "Data Sudah Tercatat",
+                  text: "Kehadiran Anda sudah pernah disimpan.",
+                  icon: "warning",
+                  button: {
+                    text: "Oke",
+                    className: "btn btn-primary"
+                  }
+                });
+
+              });
+            } else if (data.status === "error") {
+              $("#loading").hide(); // Sembunyikan spinner loading
+              $("#submitFormButton").prop("disabled", false).text("Presensi sekarang");
+              $("#save").prop("disabled", false).text("Presensi sekarang");
+
+              swal({
+                title: "Gagal Presensi",
+                text: "Gagal menyimpan data kehadiran, silakan coba lagi.",
+                icon: "error",
+                button: {
+                  text: "Coba Lagi",
+                  className: "btn btn-primary"
+                }
+              });
+            } else if (data.status === "duplicate") {
+              $("#loading").hide(); // Sembunyikan spinner loading
+              $("#submitFormButton").prop("disabled", false).text("Presensi sekarang");
+              $("#save").prop("disabled", false).text("Presensi sekarang");
+
+              $(".forma").prop("hidden", true);
+              $(".formc").prop("hidden", false);
+
+              swal({
+                title: "Data Sudah Tercatat",
+                text: "Kehadiran Anda sudah pernah disimpan.",
+                icon: "warning",
+                button: {
+                  text: "Oke",
+                  className: "btn btn-primary"
+                }
+              });
+            }
+
+          })
+          .catch(error => {
+
+            $("#loading").hide(); // Tampilkan spinner loading
+            $("#submitFormButton").prop("disabled", false).text("Presensi sekarang");
+            $("#save").prop("disabled", false).text("Presensi sekarang");
+
+            swal({
+              title: "Terjadi Kesalahan",
+              text: "Gagal menghubungi server.",
+              icon: "error",
+              button: {
+                text: "OK",
+                className: "btn btn-primary"
+              }
+            });
+
+          });
+
+      }
+
+      $(".pertemuanInput").change(function() {
+          $(".formd").removeAttr("hidden"); // Hapus atribut hidden
+          $("#step2").attr("hidden", true);  // Menambahkan atribut hidden
+
+          // Inisialisasi jSignature jika belum ada
+          
+          $sigdiv = $("#signature").jSignature({
+              'UndoButton': true,  // Tambahkan tombol Undo jika diperlukan
+              'decor-color': '#000000', // Warna untuk signature
+              'color': '#000000'  // Warna tinta signature
+          });
+          
+
+          // Pilih teks dari opsi yang dipilih dalam dropdown
+          var selectedText = $(".pertemuanInput option:selected").text();
+          $(".text-kegiatan").text(selectedText); // Update teks pada elemen .text-kegiatan
+      });
 
       // Ketika tombol "Sedang diverifikasi" diklik
       $(".btnDiverifikasi").click(function() {
@@ -438,7 +606,7 @@
         let countdown = 10;
         swal({
           title: "Proses Verifikasi",
-          text: `Kami sedang memverifikasi data kakak (Tunggu hingga : ${countdown} detik)`,
+          text: `Kami sedang memverifikasi data kakak (Hingga : ${countdown} detik)`,
           icon: "info",
           buttons: false,
           closeOnClickOutside: false,
@@ -450,7 +618,7 @@
           countdown--;
           swal({
             title: "Proses Verifikasi",
-            text: `Kami sedang memverifikasi data kakak (Tunggu hingga : ${countdown} detik)`,
+            text: `Kami sedang memverifikasi data kakak (Hingga : ${countdown} detik)`,
             icon: "info",
             buttons: false,
             closeOnClickOutside: false,
@@ -580,7 +748,7 @@
           })
           .catch((error) => {
             $("#loading").hide();
-            $("#checkButton").prop("disabled", false).text("Cek NUPTK");
+            $("#checkButton").prop("disabled", false).text("Verifikasi Kembali");
 
             clearInterval(countdownInterval);
 
@@ -608,111 +776,7 @@
 
       // Step 3: Daftar kegiatan
       $("#submitFormButton").click(function() {
-
-        $("#loading").show(); // Tampilkan spinner loading
-        $("#submitFormButton").prop("disabled", true).text("Proses Presensi...");
-
-        const idPegawai = $("#idPegawai").val(); // ID Pegawai
-        const idPertemuan = $("#pertemuanInput").val(); // Kegiatan yang dipilih
-        const tanggal = new Date().toLocaleDateString('id-ID'); // Format tanggal lokal   
-
-        generateQRCode(idPegawai); // Generate QR code
-
-        // Data yang akan dikirim ke sheet `data_kehadiran`
-        const params = {
-          idPegawai: idPegawai,
-          idPertemuan: idPertemuan
-        };
-
-        // Kirim data menggunakan fetch
-        fetch(url, {
-            redirect: "follow",
-            method: "POST",
-            body: JSON.stringify(params),
-            headers: {
-              "Content-Type": "text/plain;charset=utf-8",
-            },
-          })
-          .then(response => response.json())
-          .then(data => {
-
-            if (data.status === "success") {
-              swal({
-                title: "Presensi Berhasil!",
-                text: "Data kehadiran Anda berhasil disimpan.",
-                icon: "success",
-                button: {
-                  text: "OK",
-                  className: "btn btn-primary"
-                }
-              }).then(() => {
-                // Opsional: lakukan tindakan tambahan setelah presensi berhasil
-                // Misalnya, reset form atau navigasi ke halaman lain
-                $("#loading").hide(); // Sembunyikan spinner loading
-                $("#submitFormButton").prop("disabled", false).text("Presensi sekarang");
-
-                $(".forma").prop("hidden", true);
-                $(".formc").prop("hidden", false);
-
-                swal({
-                  title: "Data Sudah Tercatat",
-                  text: "Kehadiran Anda sudah pernah disimpan.",
-                  icon: "warning",
-                  button: {
-                    text: "Oke",
-                    className: "btn btn-primary"
-                  }
-                });
-
-              });
-            } else if (data.status === "error") {
-              $("#loading").hide(); // Sembunyikan spinner loading
-              $("#submitFormButton").prop("disabled", false).text("Presensi sekarang");
-
-              swal({
-                title: "Gagal Presensi",
-                text: "Gagal menyimpan data kehadiran, silakan coba lagi.",
-                icon: "error",
-                button: {
-                  text: "Coba Lagi",
-                  className: "btn btn-primary"
-                }
-              });
-            } else if (data.status === "duplicate") {
-              $("#loading").hide(); // Sembunyikan spinner loading
-              $("#submitFormButton").prop("disabled", false).text("Presensi sekarang");
-
-              $(".forma").prop("hidden", true);
-              $(".formc").prop("hidden", false);
-
-              swal({
-                title: "Data Sudah Tercatat",
-                text: "Kehadiran Anda sudah pernah disimpan.",
-                icon: "warning",
-                button: {
-                  text: "Oke",
-                  className: "btn btn-primary"
-                }
-              });
-            }
-
-          })
-          .catch(error => {
-
-            $("#loading").hide(); // Tampilkan spinner loading
-            $("#submitFormButton").prop("disabled", false).text("Presensi sekarang");
-
-            swal({
-              title: "Terjadi Kesalahan",
-              text: "Gagal menghubungi server.",
-              icon: "error",
-              button: {
-                text: "OK",
-                className: "btn btn-primary"
-              }
-            });
-
-          });
+        //nothing
       });
     });
   </script>
@@ -786,29 +850,15 @@
 
 </head>
 
-<body class="bg-primary">
-
-  <!-- Modal -->
-<!-- <div class="modal fade show" id="staticModal" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" style="display: block; background-color: rgba(0, 0, 0, 0.5);">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="staticBackdropLabel">Capacity Building</h1>
-      </div>
-      <div class="modal-body">
-        <p>Presensi belum dibuka. Bapak/ Ibu Silahkan ke Ruang untuk presensi di dalam.</p>
-      </div>
-    </div>
-  </div>
-</div> -->
+<body class="apple-background">
 
   <!-- HTML -->
-  <div class="header-container container mb-3 d-flex align-items-center justify-content-between">
+  <div class="header-container container mb-3 d-flex align-items-center justify-content-between w-75">
 
     <!-- Avatar Bundar di Kiri -->
     <div class="d-flex align-items-center">
       <div class="icon-container me-2">
-        <img src="https://avatar.iran.liara.run/public" class="rounded-circle avimg" alt="Avatar" width="50">
+        <img src="https://avatars.githubusercontent.com/u/195695018?s=200&v=4" class="rounded-circle avimg" alt="Avatar" width="50">
       </div>
 
       <!-- Teks "Hai, Nama" di Sebelah Avatar -->
@@ -832,7 +882,7 @@
 
   </div>
 
-  <div class="container p-5 bg-light rounded shadow forma">
+  <div class="container p-5 bg-light rounded shadow forma w-75">
 
     <h1 class="mb-4 fw-bold h3 text-dark lead">Disiplin Kehadiran Kegiatan</h1>
 
@@ -851,6 +901,13 @@
         <a class="nav-link active fw-bold text-white h6" id="step2Link" href="#" tabindex="-1" aria-disabled="true">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-badge-fill" viewBox="0 0 16 16">
             <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2zm4.5 0a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1zM8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6m5 2.755C12.146 12.825 10.623 12 8 12s-4.146.826-5 1.755V14a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1z" />
+          </svg>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link active fw-bold text-white h6" id="step3Link" href="#" tabindex="-1" aria-disabled="true">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
+            <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001"/>
           </svg>
         </a>
       </li>
@@ -880,7 +937,7 @@
     </div>
 
     <!-- Step 2: Tampilkan data pengguna dalam bentuk input -->
-    <div id="step2" class="hidden text-left" style="display: none">
+    <div id="step2" class="text-left" style="display: none">
 
       <input type="text" hidden id="idPegawai">
 
@@ -902,7 +959,7 @@
       <hr>
 
       <div class="form-floating">
-        <select id="pertemuanInput" class="form-select" aria-label="Pilih Pertemuan">
+        <select id="pertemuanInput" class="form-select pertemuanInput" aria-label="Pilih Pertemuan">
           <option value="" disabled selected>Pilih Pertemuan</option>
         </select>
         <label for="pertemuanInput">Pilih pertemuan yang tersedia saat ini</label>
@@ -912,11 +969,25 @@
         <button id="submitFormButton" class="btn btn-md btn-primary gradient-button fw-bold mt-5">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
             <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z" />
-          </svg> Presensi sekarang
+          </svg> Presensi sekarang </button>
       </div>
-      </button>
+
     </div>
 
+    <div class="formd" hidden>
+
+      <div class="container bg-white p-5 rounded border border-primary w-75">
+        <h1 class="fw-bold h3 text-dark lead">Tanda Tangan</h1>
+        <p class="text-kegiatan"></p>
+        <div id="signature"></div>        
+        <div hidden id="someelement"></div>
+        <textarea hidden id="svgTextArea" rows="10" cols="50"></textarea>
+      </div>
+
+      <button class="btn btn-outline-primary mr-5 fw-bold mt-3" id="clear">Ulangi</button>
+      <button class="btn btn-primary fw-bold mt-3" id="save">Simpan dan Presensi</button>
+
+     </div>
 
   </div>
 
@@ -943,11 +1014,13 @@
 
   <!-- Gambar di kiri -->
   <a target="_blank" href="https://bbgpjateng.kemdikbud.go.id/">
-    <img src="https://i.ibb.co.com/xf7zM5g/TULISAN-BBGP-3-1.png" class="mt-4 mb-1" width="150px" alt="bbgpjateng" border="0">
+    <!-- <img src="https://i.ibb.co.com/xf7zM5g/TULISAN-BBGP-3-1.png" class="mt-4 mb-1" width="150px" alt="bbgpjateng" border="0"> -->
+   <img src="https://i.ibb.co.com/jv7B0Cjg/kami-siap-zi-wbk1.png" class="mt-4 mb-1" width="180px" alt="bbgpjateng" border="0" alt="kami-siap-zi-wbk1" border="0">
   </a>
   <br>
 
-  <small class="mt-2 mb-5 text-white" style="font-size: 10px;">Balai Besar Guru Penggerak Jawa Tengah &copy; 2024 <br> Tata Laksana Kepegawaian dan Persuratan</small>
+  <small class="mt-2 mb-5 apple-text" style="font-size: 10px;">Balai Besar Guru Penggerak Jawa Tengah &copy; 2024 <br> Tata Laksana Kepegawaian dan Persuratan</small>
+
 
 </body>
 

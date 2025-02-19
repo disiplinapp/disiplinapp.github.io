@@ -411,6 +411,7 @@
         $("#loading").show(); // Tampilkan spinner loading
         $("#submitFormButton").prop("disabled", true).text("Proses Presensi...");
         $("#save").prop("disabled", true).text("Proses Presensi...");
+        $("#clear").prop("disabled", true).text("Ulangi");
 
         const idPegawai = $("#idPegawai").val(); // ID Pegawai
         const idPertemuan = $("#pertemuanInput").val(); // Kegiatan yang dipilih
@@ -453,6 +454,7 @@
                 $("#loading").hide(); // Sembunyikan spinner loading
                 $("#submitFormButton").prop("disabled", false).text("Presensi sekarang");
                 $("#save").prop("disabled", false).text("Presensi sekarang");
+                $("#clear").prop("disabled", false).text("Ulangi");
 
                 $(".forma").prop("hidden", true);
                 $(".formc").prop("hidden", false);
@@ -472,6 +474,7 @@
               $("#loading").hide(); // Sembunyikan spinner loading
               $("#submitFormButton").prop("disabled", false).text("Presensi sekarang");
               $("#save").prop("disabled", false).text("Presensi sekarang");
+              $("#clear").prop("disabled", false).text("Ulangi");
 
               swal({
                 title: "Gagal Presensi",
@@ -486,6 +489,7 @@
               $("#loading").hide(); // Sembunyikan spinner loading
               $("#submitFormButton").prop("disabled", false).text("Presensi sekarang");
               $("#save").prop("disabled", false).text("Presensi sekarang");
+            $("#clear").prop("disabled", false).text("Ulangi");
 
               $(".forma").prop("hidden", true);
               $(".formc").prop("hidden", false);
@@ -507,6 +511,7 @@
             $("#loading").hide(); // Tampilkan spinner loading
             $("#submitFormButton").prop("disabled", false).text("Presensi sekarang");
             $("#save").prop("disabled", false).text("Presensi sekarang");
+            $("#clear").prop("disabled", false).text("Ulangi");
 
             swal({
               title: "Terjadi Kesalahan",
@@ -524,7 +529,7 @@
 
       $(".pertemuanInput").change(function() {
             $(".formd").removeAttr("hidden"); // Hapus atribut hidden
-            $("#step2").attr("hidden", true); // Menambahkan atribut hidden
+            //$("#step2").attr("hidden", true); // Menambahkan atribut hidden
 
             // Tampilkan modal
             $("#staticBackdrop").modal("show");

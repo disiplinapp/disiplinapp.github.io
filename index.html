@@ -494,6 +494,8 @@
               $(".forma").prop("hidden", true);
               $(".formc").prop("hidden", false);
 
+            $("#staticBackdrop").modal("hide");
+
               swal({
                 title: "Data Sudah Tercatat",
                 text: "Kehadiran Anda sudah pernah disimpan.",
@@ -1023,12 +1025,11 @@
         </div>
     </div>
 
-
   </div>
 
   <div class="formc" hidden>
 
-    <div class="container cetakboardingpass bg-white p-5 rounded shadow">
+    <div class="container cetakboardingpass bg-white p-5 rounded shadow w-75">
       <h1 class="mb-4 fw-bold">Status Kehadiran</h1>
       <p class="lead">Kegiatan BBGP Provinsi Jawa Tengah.</p>
 

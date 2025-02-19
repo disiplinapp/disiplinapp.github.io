@@ -71,9 +71,9 @@
   <script>
     $(document).ready(function() {
 
-    //   $(document).on("contextmenu", function(event) {
-    //     event.preventDefault(); // Mencegah menu konteks muncul
-    //   });
+      $(document).on("contextmenu", function(event) {
+        event.preventDefault(); // Mencegah menu konteks muncul
+      });
 
       let dataDummy = {
         id_pertemuan: 99,
@@ -85,12 +85,6 @@
       //tampilKegiatan(dataDummy);
 
       var $sigdiv;
-
-      $sigdiv = $("#signature").jSignature({
-              'UndoButton': false,  // Tambahkan tombol Undo jika diperlukan
-              'decor-color': '#000000', // Warna untuk signature
-              'color': '#000000'  // Warna tinta signature
-          });
 
       $("#clear").click(function () {
           $sigdiv.jSignature("reset");
@@ -529,30 +523,27 @@
       }
 
       $(".pertemuanInput").change(function() {
-          $(".formd").removeAttr("hidden"); // Hapus atribut hidden
-          $("#step2").attr("hidden", true);  // Menambahkan atribut hidden
+            $(".formd").removeAttr("hidden"); // Hapus atribut hidden
+            $("#step2").attr("hidden", true); // Menambahkan atribut hidden
 
-          $sigdiv = $("#signature").jSignature({
-              'UndoButton': false,  // Tambahkan tombol Undo jika diperlukan
-              'decor-color': '#000000', // Warna untuk signature
-              'color': '#000000'  // Warna tinta signature
-          });
+            // Tampilkan modal
+            $("#staticBackdrop").modal("show");
 
-          //modal show
-          $("#staticBackdrop").modal("show");
-          // Inisialisasi jSignature jika belum ada
-          
-          
-          // Pilih teks dari opsi yang dipilih dalam dropdown
-          var selectedText = $(".pertemuanInput option:selected").text();
-          $(".text-kegiatan").text(selectedText); // Update teks pada elemen .text-kegiatan
+            // Pastikan jSignature hanya diinisialisasi sekali
+            if (!$("#signature").hasClass("initialized")) {
+                $sigdiv = $("#signature").addClass("initialized").jSignature({
+                    'UndoButton': true,  // Tambahkan tombol Undo jika diperlukan
+                    'decor-color': '#000000', // Warna untuk signature
+                    'color': '#000000',  // Warna tinta signature
+                    'width': 400,  // Sesuaikan lebar canvas
+                    'height': 250  // Sesuaikan tinggi canvas agar lebih panjang
+                });
+            }
 
-          $sigdiv = $("#signature").jSignature({
-              'UndoButton': false,  // Tambahkan tombol Undo jika diperlukan
-              'decor-color': '#000000', // Warna untuk signature
-              'color': '#000000'  // Warna tinta signature
-          });
-      });
+            // Pilih teks dari opsi yang dipilih dalam dropdown
+            var selectedText = $(".pertemuanInput option:selected").text();
+            $(".text-kegiatan").text(selectedText); // Update teks pada elemen .text-kegiatan
+        });
 
       // Ketika tombol "Sedang diverifikasi" diklik
       $(".btnDiverifikasi").click(function() {

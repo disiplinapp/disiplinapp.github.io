@@ -15,6 +15,8 @@
   <!-- Untuk iOS -->
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
   <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
@@ -66,12 +68,13 @@
     }
   </style>
 
+<!-- Bootstrap JS (Pastikan ini ada) -->
   <script>
     $(document).ready(function() {
 
-      $(document).on("contextmenu", function(event) {
-        event.preventDefault(); // Mencegah menu konteks muncul
-      });
+    //   $(document).on("contextmenu", function(event) {
+    //     event.preventDefault(); // Mencegah menu konteks muncul
+    //   });
 
       let dataDummy = {
         id_pertemuan: 99,
@@ -83,6 +86,12 @@
       //tampilKegiatan(dataDummy);
 
       var $sigdiv;
+
+      $sigdiv = $("#signature").jSignature({
+              'UndoButton': false,  // Tambahkan tombol Undo jika diperlukan
+              'decor-color': '#000000', // Warna untuk signature
+              'color': '#000000'  // Warna tinta signature
+          });
 
       $("#clear").click(function () {
           $sigdiv.jSignature("reset");
@@ -524,15 +533,17 @@
           $(".formd").removeAttr("hidden"); // Hapus atribut hidden
           $("#step2").attr("hidden", true);  // Menambahkan atribut hidden
 
-          // Inisialisasi jSignature jika belum ada
-          
           $sigdiv = $("#signature").jSignature({
               'UndoButton': false,  // Tambahkan tombol Undo jika diperlukan
               'decor-color': '#000000', // Warna untuk signature
               'color': '#000000'  // Warna tinta signature
           });
-          
 
+          //modal show
+          $("#staticBackdrop").modal("show");
+          // Inisialisasi jSignature jika belum ada
+          
+          
           // Pilih teks dari opsi yang dipilih dalam dropdown
           var selectedText = $(".pertemuanInput option:selected").text();
           $(".text-kegiatan").text(selectedText); // Update teks pada elemen .text-kegiatan
@@ -977,20 +988,40 @@
 
     </div>
 
-    <div class="formd">
+    <!-- Modal -->
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">Tanda Tangan</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
 
-      <div class="container bg-white p-3 rounded border border-primary" style="height: 500px;">
-        <h1 class="fw-bold h5 text-dark">Tanda Tangan</h1>
-        <p hidden class="text-kegiatan text-dark"></p>
-        <div id="signature"></div>        
-        <div hidden id="someelement"></div>
-        <textarea hidden id="svgTextArea" rows="10" cols="50"></textarea>
-      </div>
+                <div class="formd">
 
-      <button class="btn btn-outline-primary mr-5 fw-bold mt-3" id="clear">Ulangi</button>
-      <button class="btn btn-primary fw-bold mt-3" id="save">Simpan dan Presensi</button>
+                    <div class="container bg-white p-3 rounded border border-primary" style="height: 300px;">
+                        <!-- <h1 class="fw-bold h5 text-dark">Tanda Tangan</h1> -->
+                        <p hidden class="text-kegiatan text-dark"></p>
+                        <div id="signature"></div>        
+                        <div hidden id="someelement"></div>
+                        <textarea hidden id="svgTextArea" rows="10" cols="50"></textarea>
+                    </div>
 
-     </div>
+                    <!-- <button class="btn btn-outline-primary mr-5 fw-bold mt-3" id="clear">Ulangi</button>
+                    <button class="btn btn-primary fw-bold mt-3" id="save">Simpan dan Presensi</button> -->
+
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-primary" id="clear">Ulangi</button>
+                <button type="button" class="btn btn-primary" id="save">Simpan dan Presensi</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
 
   </div>
 
